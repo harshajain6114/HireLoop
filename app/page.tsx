@@ -1,11 +1,11 @@
-'use client'
-
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, TrendingDown, MessageSquare } from 'lucide-react'
+import { getSession } from '@/lib/auth'
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await getSession()
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       {/* Navigation */}
@@ -21,11 +21,27 @@ export default function LandingPage() {
             <a href="#" className="text-slate-300 hover:text-white transition-colors">
               Pricing
             </a>
-            <Button variant="outline" asChild className="border-slate-700 text-blue-400 hover:bg-slate-800">
-              <Link href="/dashboard">
-                Login
-              </Link>
-            </Button>
+            {session ? (
+              <div className="flex items-center gap-4">
+                <span className="text-slate-300">Welcome, {session.user.name}!</span>
+                <Button asChild variant="outline" className="border-slate-700 text-blue-400 hover:bg-slate-800">
+                  <Link href="/dashboard">
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="text-slate-300 hover:text-white">
+                  <Link href="/auth/logout">
+                    Logout
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" asChild className="border-slate-700 text-blue-400 hover:bg-slate-800">
+                <Link href="/auth/login">
+                  Login
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </nav>
@@ -43,11 +59,20 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-8">
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
-              <Link href="/dashboard">
-                Connect Gmail & Get Started
-              </Link>
-            </Button>
+            {!session && (
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
+                <Link href="/auth/login">
+                  Connect Gmail & Get Started
+                </Link>
+              </Button>
+            )}
+            {session && (
+              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg">
+                <Link href="/dashboard">
+                  Go to Dashboard
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -112,7 +137,7 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold text-white">Ready to land your next role?</h2>
           <p className="text-xl text-slate-300">Start tracking your applications with intelligence today.</p>
           <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
-            <Link href="/dashboard">
+            <Link href="/auth/login">
               Get Started Free
             </Link>
           </Button>
