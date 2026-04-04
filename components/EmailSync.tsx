@@ -26,6 +26,10 @@ export default function EmailSync() {
     try {
       const res = await fetch('/api/gmail')
       const data = await res.json()
+      if (data.needsReconnect) {
+        window.location.href = '/api/connected-accounts/connect'
+        return
+      }
       if (data.success) {
         setResult(data)
         router.refresh()

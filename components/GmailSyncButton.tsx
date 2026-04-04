@@ -11,10 +11,13 @@ export const GmailSyncButton = () => {
       
       console.log('Gmail sync response:', data)
       
-      if (data.success) {
+      if (response.ok && data.success) {
         alert(`Success! Fetched ${data.messageCount} messages.`)
+        window.location.reload()
+      } else if (data.needsReconnect) {
+        window.location.href = '/api/connected-accounts/connect'
       } else {
-        alert(`Error syncing Gmail: ${data.error}`)
+        alert(`Error syncing Gmail: ${data.error || data.details || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Error syncing Gmail:', error)
