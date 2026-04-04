@@ -125,7 +125,7 @@ export default async function EmailsPage() {
   const session = await auth0.getSession()
   if (!session) redirect('/auth/login')
 
-  const store = getEmailStore()
+  const store = getEmailStore(session.user.sub)
   const emails = store.emails
   const categories: EmailCategory[] = ['Applied', 'Interview', 'Rejected', 'Offered']
 
@@ -177,7 +177,7 @@ export default async function EmailsPage() {
           <>
             {/* Total count */}
             <div className="text-sm text-slate-500 mb-5">
-              Found <span className="text-white font-semibold">{emails.length}</span> job-related emails out of your last 50
+              Showing the latest <span className="text-white font-semibold">{emails.length}</span> job-related emails from your inbox (Scanned via last 500 matching emails)
             </div>
 
             {/* 4-column grid */}

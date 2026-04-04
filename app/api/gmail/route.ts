@@ -88,9 +88,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No Gmail token from Token Vault' }, { status: 400 })
     }
 
-    // Fetch last 50 message IDs
+    // Build a query string to filter for potential job-related emails AT THE GMAIL LEVEL
+    const jobKeywords = [
+      'application', 'position', 'interview', 'unfortunately', 'regret', 
+      'offer', 'applied', 'hiring', 'recruiter', 'resume', 'candidate',
+      '"not moving forward"', '"careful review"', 'rejection', 'assessment', 'exam', 'test', 'assignment'
+    ]
+    const searchQuery = '{' + jobKeywords.join(' ') + '}'
+    const listUrl = `https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=500&q=${encodeURIComponent(searchQuery)}`
+
+    // Fetch last 500 matching message IDs
     const listRes = await fetch(
-      'https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=50',
+      listUrl,
       { headers: { Authorization: `Bearer ${gmailAccessToken}` } }
     )
     const listData = await listRes.json()
@@ -102,8 +111,8 @@ export async function GET(request: NextRequest) {
     // Sort by date descending (newest first)
     jobEmails.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
-    // Save to JSON file
-    saveEmails(jobEmails)
+    // Save to per-user JSON file
+    saveEmails(session.user.sub, jobEmails)
 
     const counts = {
       total: jobEmails.length,
@@ -119,8 +128,11 @@ export async function GET(request: NextRequest) {
       counts,
       emails: jobEmails,
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gmail sync error:', error)
+    if (error?.code === 'failed_to_exchange_refresh_token' || String(error).includes('failed_to_exchange_refresh_token')) {
+      return NextResponse.json({ needsReconnect: true, error: 'Re-authorization required' }, { status: 401 })
+    }
     return NextResponse.json({ error: 'Server error', details: String(error) }, { status: 500 })
   }
 }
