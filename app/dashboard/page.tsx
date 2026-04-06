@@ -11,6 +11,8 @@ const NAV_PAGES = [
   { href: '/settings',          emoji: '⚙️', label: 'Settings',          desc: 'Account & preferences',                        color: 'hover:border-slate-500/40' },
 ]
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const session = await getSession()
   if (!session) redirect('/auth/login')

@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     try {
       const genAI = new GoogleGenerativeAI(geminiKey)
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
       const results = []
       for (const email of top2) {

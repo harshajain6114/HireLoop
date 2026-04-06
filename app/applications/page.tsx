@@ -13,6 +13,8 @@ const CATEGORY_STYLE: Record<string, { color: string; bg: string; dot: string }>
   Other:     { color: 'text-slate-400',   bg: 'bg-slate-500/10 border-slate-500/20',  dot: 'bg-slate-400' },
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ApplicationsPage() {
   const session = await getSession()
   if (!session) redirect('/auth/login')

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const domain = process.env.AUTH0_DOMAIN
     const clientId = process.env.AUTH0_CLIENT_ID
     const clientSecret = process.env.AUTH0_CLIENT_SECRET
-    const baseUrl = process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.AUTH0_BASE_URL || 'https://hire-loop-4hp3.vercel.app'
 
     // Step 1: Exchange Auth0 refresh token for My Account API access token
     const myAccountTokenRes = await fetch(`https://${domain}/oauth/token`, {

@@ -122,6 +122,8 @@ function StatCard({ category, count, emails }: { category: EmailCategory; count:
   )
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function EmailsPage() {
   const session = await getSession();
 

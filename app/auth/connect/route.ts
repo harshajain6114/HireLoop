@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   const domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
-  const baseURL = process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+  const baseURL = process.env.AUTH0_BASE_URL || 'https://hire-loop-4hp3.vercel.app'
 
   const { searchParams } = new URL(request.url)
   const connection = searchParams.get('connection') || 'google-oauth2'

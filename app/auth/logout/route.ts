@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const baseURL = process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+  const baseURL = process.env.AUTH0_BASE_URL || 'https://hire-loop-4hp3.vercel.app'
 
   // Redirect home and clear the session cookie on that same response
   const response = NextResponse.redirect(new URL('/', baseURL))
