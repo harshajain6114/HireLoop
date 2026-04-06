@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'HireLoop - Job Search Management',
-  description: 'Track applications, analyze rejections, and manage follow-ups automatically',
+  title: 'HireLoop -AI-Powered Job Search Agent',
+  description: 'Track applications, analyze why you get rejected, and let AI draft follow-up emails -all secured by Auth0 Token Vault.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="font-sans antialiased bg-slate-950 text-white">
+      <body className={`${inter.className} antialiased bg-[#080c14] text-white`}>
         {children}
         <Analytics />
       </body>

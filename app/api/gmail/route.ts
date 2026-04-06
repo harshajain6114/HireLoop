@@ -1,6 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth0 } from '@/lib/auth0'
+import { getSession } from '@/lib/auth'
 import { saveEmails, categorizeEmail, isJobRelated, JobEmail } from '@/lib/email-store'
+
+async function getGoogleAccessToken(userSub: string): Promise<string | null> {
+  const domain = process.env.AUTH0_DOMAIN
+  const clientId = process.env.AUTH0_MGMT_CLIENT_ID
+  const clientSecret = process.env.AUTH0_MGMT_CLIENT_SECRET
+
+  try {
+    const mgmtRes = await fetch(`https://${domain}/oauth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+        audience: `https://${domain}/api/v2/`,
+      }),
+    })
+
+    if (!mgmtRes.ok) return null
+    const { access_token: mgmtToken } = await mgmtRes.json()
+
+    const userRes = await fetch(`https://${domain}/api/v2/users/${encodeURIComponent(userSub)}`, {
+      headers: { Authorization: `Bearer ${mgmtToken}` },
+    })
+
+    if (!userRes.ok) return null
+    const userData = await userRes.json()
+
+    const googleIdentity = userData.identities?.find((id: any) => id.provider === 'google-oauth2')
+    if (!googleIdentity?.access_token) return null
+    return googleIdentity.access_token
+  } catch (e: any) {
+    return null
+  }
+}
 
 interface GmailMessage {
   id: string
@@ -74,18 +109,16 @@ async function fetchEmailMetadata(
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth0.getSession()
+    const session = await getSession()
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Get Gmail access token from Token Vault
-    const { token: gmailAccessToken } = await auth0.getAccessTokenForConnection({
-      connection: 'google-oauth2',
-    })
+    // Get Gmail access token via Management API
+    const gmailAccessToken = await getGoogleAccessToken(session.user.sub)
 
     if (!gmailAccessToken) {
-      return NextResponse.json({ error: 'No Gmail token from Token Vault' }, { status: 400 })
+      return NextResponse.json({ needsReconnect: true, error: 'No Gmail token from Token Vault. Please log in again.' }, { status: 401 })
     }
 
     // Build a query string to filter for potential job-related emails AT THE GMAIL LEVEL

@@ -1,40 +1,39 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, Legend, CartesianGrid } from 'recharts'
+import { useState } from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, Legend, CartesianGrid } from 'recharts';
 
-export default function RejectionAnalysisPage() {
-  const [analyzing, setAnalyzing] = useState(false)
-  const [analysis, setAnalysis] = useState<any>(null)
-  const [error, setError] = useState('')
+export default function RejectionAnalysisClient() {
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [error, setError] = useState('');
 
   const handleAnalyze = async () => {
-    setAnalyzing(true)
-    setError('')
+    setAnalyzing(true);
+    setError('');
     try {
-      // Intentionally passing empty request to let server fetch the emails for safety
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({})
-      })
-      const data = await res.json()
-      
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+
       if (data.success) {
-        setAnalysis(data.analysis)
+        setAnalysis(data.analysis);
       } else {
-        setError(data.error + (data.details ? ` (${data.details})` : '') || 'Failed to analyze')
+        setError(data.error + (data.details ? ` (${data.details})` : '') || 'Failed to analyze');
       }
     } catch (e) {
-      setError('Network error occurred during analysis.')
+      setError('Network error occurred during analysis.');
     } finally {
-      setAnalyzing(false)
+      setAnalyzing(false);
     }
-  }
+  };
 
-  const COLORS = ['#818cf8', '#34d399', '#f87171', '#fbbf24', '#a78bfa', '#f472b6']
+  const COLORS = ['#818cf8', '#34d399', '#f87171', '#fbbf24', '#a78bfa', '#f472b6'];
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
@@ -179,5 +178,6 @@ export default function RejectionAnalysisPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
+

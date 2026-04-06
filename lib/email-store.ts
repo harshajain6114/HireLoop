@@ -54,7 +54,7 @@ export function getEmailStore(userId: string): EmailStore {
 export function categorizeEmail(subject: string, snippet: string): EmailCategory {
   const text = (subject + ' ' + snippet).toLowerCase()
 
-  // Order matters — more specific patterns first
+  // Order matters -more specific patterns first
   if (/unfortunately|regret to inform|not moving forward|not selected|not proceed|other candidates|appreciate your interest|will not be|decided not to|not a fit|decline|not shortlisted|position has been filled|do not meet|kept on file|wish you the best|we appreciate your interest but|we have decided|will not be moving|after careful consideration|we regret/.test(text)) {
     return 'Rejected'
   }

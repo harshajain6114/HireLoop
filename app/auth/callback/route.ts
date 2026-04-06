@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
     })
 
     if (!userResponse.ok) {
-      console.error('Failed to fetch user info')
+      const error = await userResponse.json()
+      console.error('Failed to fetch user info:', error)
       return NextResponse.json(
         { error: 'Failed to fetch user info' },
         { status: 500 }
@@ -57,34 +58,27 @@ export async function GET(request: NextRequest) {
 
     const user = await userResponse.json()
 
-    // Create response and set secure cookie with session data
-    const response = NextResponse.redirect(new URL('/', request.url))
-    
-    // Store session data as JSON string
+    // Set session cookie
     const sessionData = {
-      user: {
-        sub: user.sub,
-        name: user.name,
-        email: user.email,
-        picture: user.picture || '',
-      },
+      user,
       accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token,
       expiresAt: Date.now() + tokens.expires_in * 1000,
     }
-    
+
+    const response = NextResponse.redirect(new URL('/', baseURL))
     response.cookies.set('auth-session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: tokens.expires_in,
       path: '/',
+      maxAge: tokens.expires_in,
     })
 
     return response
   } catch (error) {
     console.error('Callback error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'An error occurred during authentication' },
       { status: 500 }
     )
   }
