@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
     const domain = process.env.AUTH0_DOMAIN
     const clientId = process.env.AUTH0_CLIENT_ID
     const clientSecret = process.env.AUTH0_CLIENT_SECRET
-    const baseURL = process.env.AUTH0_BASE_URL || 'http://localhost:3000';
+    
+    // Dynamically determine baseURL from the request to fix Vercel deployment issues
+    const baseURL = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : (process.env.AUTH0_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`);
 
     const tokenResponse = await fetch(`https://${domain}/oauth/token`, {
       method: 'POST',
