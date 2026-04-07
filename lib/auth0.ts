@@ -12,5 +12,5 @@ export const auth0 = new Auth0Client({
   domain,
   clientId: process.env.AUTH0_CLIENT_ID,
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
-  baseURL: process.env.AUTH0_BASE_URL || 'http://localhost:3000',
+  baseURL: process.env.AUTH0_BASE_URL || (process.env.NODE_ENV === 'production' ? 'https://hire-loop-g92h.vercel.app' : 'http://localhost:3000'),
 })

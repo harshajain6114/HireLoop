@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
     const domain = process.env.AUTH0_DOMAIN
     const clientId = process.env.AUTH0_CLIENT_ID
     const clientSecret = process.env.AUTH0_CLIENT_SECRET
-    const baseURL = process.env.AUTH0_BASE_URL || 'http://localhost:3000'
+    
+    // Strictly force the domain for Vercel production to avoid any preview URL leaks
+    const baseURL = process.env.NODE_ENV === 'production' 
+      ? 'https://hire-loop-g92h.vercel.app' 
+      : 'http://localhost:3000'
 
     const tokenResponse = await fetch(`https://${domain}/oauth/token`, {
       method: 'POST',
@@ -48,7 +52,8 @@ export async function GET(request: NextRequest) {
     })
 
     if (!userResponse.ok) {
-      console.error('Failed to fetch user info')
+      const error = await userResponse.json()
+      console.error('Failed to fetch user info:', error)
       return NextResponse.json(
         { error: 'Failed to fetch user info' },
         { status: 500 }
@@ -57,34 +62,27 @@ export async function GET(request: NextRequest) {
 
     const user = await userResponse.json()
 
-    // Create response and set secure cookie with session data
-    const response = NextResponse.redirect(new URL('/', request.url))
-    
-    // Store session data as JSON string
+    // Set session cookie
     const sessionData = {
-      user: {
-        sub: user.sub,
-        name: user.name,
-        email: user.email,
-        picture: user.picture || '',
-      },
+      user,
       accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token,
       expiresAt: Date.now() + tokens.expires_in * 1000,
     }
-    
+
+    const response = NextResponse.redirect(new URL('/', baseURL))
     response.cookies.set('auth-session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: tokens.expires_in,
       path: '/',
+      maxAge: tokens.expires_in,
     })
 
     return response
   } catch (error) {
     console.error('Callback error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'An error occurred during authentication' },
       { status: 500 }
     )
   }

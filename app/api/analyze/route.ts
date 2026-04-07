@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth0 } from '@/lib/auth0'
+import { getSession } from '@/lib/auth'
 import { getEmailStore } from '@/lib/email-store'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth0.getSession()
+    const session = await getSession()
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }

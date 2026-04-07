@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getEmailStore, JobEmail, EmailCategory } from '@/lib/email-store'
 import EmailSync from '@/components/EmailSync'
 import Link from 'next/link'
+import { getSession } from '@/lib/auth';
 
 const CATEGORY_CONFIG: Record<EmailCategory, {
   label: string
@@ -121,9 +122,15 @@ function StatCard({ category, count, emails }: { category: EmailCategory; count:
   )
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function EmailsPage() {
-  const session = await auth0.getSession()
-  if (!session) redirect('/auth/login')
+  const session = await getSession();
+
+  if (!session) {
+    redirect('/auth/login');
+    return null;
+  }
 
   const store = getEmailStore(session.user.sub)
   const emails = store.emails

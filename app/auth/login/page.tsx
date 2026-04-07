@@ -37,7 +37,7 @@ export default function LoginPage() {
                size="lg" 
                className="w-full h-14 bg-white hover:bg-slate-100 text-slate-900 font-semibold flex items-center justify-center gap-3 transition-all active:scale-[0.982] shadow-lg shadow-white/5"
             >
-              <a href="/auth/login">
+              <a href="/auth/connect">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
