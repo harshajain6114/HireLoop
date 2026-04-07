@@ -4,10 +4,10 @@ export async function GET(request: NextRequest) {
   const domain = process.env.AUTH0_DOMAIN
   const clientId = process.env.AUTH0_CLIENT_ID
   
-  // Dynamically determine baseURL from the request to fix Vercel deployment issues
-  const baseURL = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}` 
-    : (process.env.AUTH0_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`)
+  // Strictly force the domain for Vercel production to avoid any preview URL leaks
+  const baseURL = process.env.NODE_ENV === 'production' 
+    ? 'https://hire-loop-g92h.vercel.app' 
+    : 'http://localhost:3000'
 
   const { searchParams } = new URL(request.url)
   const connection = searchParams.get('connection') || 'google-oauth2'
